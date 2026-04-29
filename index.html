@@ -4,765 +4,547 @@
 <meta charset="UTF-8">
 <title>谢晓亮院士关系网络图</title>
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-body {
-    background: #060d1f;
-    overflow: hidden;
-    font-family: 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
-    user-select: none;
-}
-canvas {
-    display: block;
-    cursor: grab;
-}
-canvas.grabbing {
-    cursor: grabbing;
-}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#060d1f; overflow:hidden; font-family:'PingFang SC','Helvetica Neue','Microsoft YaHei',sans-serif; user-select:none; }
+canvas { display:block; cursor:grab; }
+canvas.grabbing { cursor:grabbing; }
 #tooltip {
-    position: fixed;
-    background: rgba(6, 16, 40, 0.96);
-    border: 1px solid #2a5a9a;
-    border-radius: 10px;
-    padding: 12px 16px;
-    color: #cde;
-    font-size: 12px;
-    max-width: 270px;
-    pointer-events: none;
-    display: none;
-    z-index: 100;
-    line-height: 1.75;
-    box-shadow: 0 4px 28px rgba(0, 60, 200, 0.45);
+  position:fixed; background:rgba(6,16,40,0.96); border:1px solid #2a5a9a;
+  border-radius:10px; padding:12px 16px; color:#cde; font-size:12px;
+  max-width:270px; pointer-events:none; display:none; z-index:100;
+  line-height:1.75; box-shadow:0 4px 28px rgba(0,60,200,0.45);
 }
-#tooltip h3 {
-    color: #7ac4ff;
-    font-size: 13.5px;
-    margin-bottom: 5px;
-    border-bottom: 1px solid #1a3a6a;
-    padding-bottom: 4px;
-}
-#tooltip .desc {
-    color: #a8c4de;
-    white-space: pre-line;
-    font-size: 11.5px;
-    margin: 5px 0 8px;
-}
-#tooltip .tag {
-    display: inline-block;
-    background: rgba(40, 100, 200, 0.28);
-    border: 1px solid #2a5a9a;
-    border-radius: 3px;
-    padding: 0 5px;
-    font-size: 10px;
-    margin: 2px 2px 0 0;
-    color: #8cc8ff;
-}
+#tooltip h3 { color:#7ac4ff; font-size:13.5px; margin-bottom:5px; border-bottom:1px solid #1a3a6a; padding-bottom:4px; }
+#tooltip .desc { color:#a8c4de; white-space:pre-line; font-size:11.5px; margin:5px 0 8px; }
+#tooltip .tag { display:inline-block; background:rgba(40,100,200,0.28); border:1px solid #2a5a9a; border-radius:3px; padding:0 5px; font-size:10px; margin:2px 2px 0 0; color:#8cc8ff; }
 #header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 62px;
-    background: linear-gradient(180deg, rgba(6, 14, 32, 0.98) 0%, transparent 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
+  position:fixed; top:0; left:0; right:0; height:62px;
+  background:linear-gradient(180deg,rgba(6,14,32,0.98) 0%,transparent 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;
 }
-#title {
-    color: #7ac4ff;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-shadow: 0 0 18px rgba(100, 180, 255, 0.5);
-}
-#subtitle {
-    color: #4a7a9a;
-    font-size: 11px;
-    margin-top: 3px;
-    letter-spacing: 1.5px;
-}
+#title { color:#7ac4ff; font-size:20px; font-weight:700; letter-spacing:3px; text-shadow:0 0 18px rgba(100,180,255,0.5); }
+#subtitle { color:#4a7a9a; font-size:11px; margin-top:3px; letter-spacing:1.5px; }
 #legend {
-    position: fixed;
-    top: 78px;
-    left: 15px;
-    background: rgba(6, 14, 32, 0.92);
-    border: 1px solid #1e3a6a;
-    border-radius: 10px;
-    padding: 11px 14px;
-    color: #99aabb;
-    font-size: 10.5px;
+  position:fixed; top:78px; left:15px; background:rgba(6,14,32,0.92);
+  border:1px solid #1e3a6a; border-radius:10px; padding:11px 14px; color:#99aabb; font-size:10.5px;
 }
-#legend h3 {
-    color: #6ab3f3;
-    font-size: 11px;
-    margin-bottom: 7px;
-    letter-spacing: 1px;
-}
-.li {
-    display: flex;
-    align-items: center;
-    margin: 4px 0;
-}
-.dot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    margin-right: 7px;
-    flex-shrink: 0;
-}
-.sep {
-    height: 1px;
-    background: #1e3a6a;
-    margin: 5px 0;
-}
-#hint {
-    position: fixed;
-    bottom: 13px;
-    right: 15px;
-    color: #3a5a7a;
-    font-size: 10px;
-    text-align: right;
-    line-height: 1.9;
-}
-#stats {
-    position: fixed;
-    bottom: 13px;
-    left: 15px;
-    color: #3a6080;
-    font-size: 10px;
-}
-#stats b {
-    color: #5a9acc;
-}
+#legend h3 { color:#6ab3f3; font-size:11px; margin-bottom:7px; letter-spacing:1px; }
+.li { display:flex; align-items:center; margin:4px 0; }
+.dot { width:9px; height:9px; border-radius:50%; margin-right:7px; flex-shrink:0; }
+.sep { height:1px; background:#1e3a6a; margin:5px 0; }
+#hint { position:fixed; bottom:13px; right:15px; color:#3a5a7a; font-size:10px; text-align:right; line-height:1.9; }
+#stats { position:fixed; bottom:13px; left:15px; color:#3a6080; font-size:10px; }
+#stats b { color:#5a9acc; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <div id="tooltip"></div>
 <div id="header">
-    <div id="title">谢晓亮院士关系网络图</div>
-    <div id="subtitle">单分子生物物理化学奠基人 · 中科院院士 · 昌平实验室主任 · 单细胞基因组学先驱</div>
+  <div id="title">谢晓亮院士关系网络图</div>
+  <div id="subtitle">单分子生物物理化学奠基人 · 中科院院士 · 昌平实验室主任 · 单细胞基因组学先驱</div>
 </div>
 <div id="legend">
-    <h3>节点类型</h3>
-    <div class="li"><div class="dot" style="background:#ff6b35"></div>核心人物</div>
-    <div class="li"><div class="dot" style="background:#4a9eff"></div>求学机构</div>
-    <div class="li"><div class="dot" style="background:#2a6abf"></div>任职机构</div>
-    <div class="li"><div class="dot" style="background:#00c896"></div>创立/技术成果</div>
-    <div class="li"><div class="dot" style="background:#c77dff"></div>师承学生</div>
-    <div class="li"><div class="dot" style="background:#06d6a0"></div>学术合作者</div>
-    <div class="li"><div class="dot" style="background:#ffd166"></div>奖项荣誉</div>
-    <div class="li"><div class="dot" style="background:#ef476f"></div>产业合作企业</div>
-    <div class="li"><div class="dot" style="background:#8ecae6"></div>研究方向</div>
-    <div class="sep"></div>
-    <h3 style="margin-bottom:6px">关系类型</h3>
-    <div class="li"><div style="width:18px;height:2px;background:#4a9eff;margin-right:7px"></div>求学/工作</div>
-    <div class="li"><div style="width:18px;height:2px;background:#00c896;margin-right:7px"></div>创立</div>
-    <div class="li"><div style="width:18px;height:2px;background:#c77dff;margin-right:7px"></div>师承</div>
-    <div class="li"><div style="width:18px;height:2px;background:#ef476f;margin-right:7px"></div>商业</div>
-    <div class="li"><div style="width:18px;height:2px;background:#06d6a0;margin-right:7px"></div>合作</div>
-    <div class="li"><div style="width:18px;height:2px;background:#ffd166;margin-right:7px"></div>荣誉</div>
-    <div class="li"><div style="width:18px;height:2px;background:#4a7aaa;border-top:1px dashed #4a7aaa;margin-right:7px"></div>隶属/研究</div>
+  <h3>节点类型</h3>
+  <div class="li"><div class="dot" style="background:#ff6b35"></div>核心人物</div>
+  <div class="li"><div class="dot" style="background:#4a9eff"></div>求学/任职机构</div>
+  <div class="li"><div class="dot" style="background:#00c896"></div>技术成果</div>
+  <div class="li"><div class="dot" style="background:#c77dff"></div>师承/学生</div>
+  <div class="li"><div class="dot" style="background:#06d6a0"></div>学术合作者</div>
+  <div class="li"><div class="dot" style="background:#ffd166"></div>奖项荣誉</div>
+  <div class="li"><div class="dot" style="background:#ef476f"></div>产业合作</div>
+  <div class="sep"></div>
+  <h3 style="margin-bottom:6px">关系与脉络</h3>
+  <div class="li"><div style="width:18px;height:2.5px;background:#7cc8ff;margin-right:7px"></div>核心技术线（粗·亮）</div>
+  <div class="li"><div style="width:18px;height:2px;background:#06d6a0;margin-right:7px"></div>合作/师承/商业</div>
+  <div class="li"><div style="width:18px;height:2px;background:#ffd166;margin-right:7px"></div>荣誉</div>
+  <div class="li"><div style="width:18px;height:2px;background:#4a7aaa;border-top:1px dashed #4a7aaa;margin-right:7px"></div>隶属/研究</div>
 </div>
-<div id="hint">滚轮缩放 · 拖拽平移<br>点击节点 → 高亮关联<br>再次点击 → 取消</div>
+<div id="hint">滚轮缩放 · 拖拽平移<br>点击技术节点→高亮核心‑技术‑人物链路<br>再次点击取消</div>
 <div id="stats">节点 <b id="nc">—</b> &nbsp;|&nbsp; 关系 <b id="lc">—</b></div>
 
 <script>
 // ─────────────────────── 配色方案 ────────────────────────────────────────────────
 const GC = {
-    core: '#ff6b35',
-    edu: '#4a9eff',
-    career: '#2a6abf',
-    founded: '#00c896',
-    student: '#c77dff',
-    collab: '#06d6a0',
-    award: '#ffd166',
-    biz: '#ef476f',
-    research: '#8ecae6',
-    initiative: '#f77f00'
+  core:'#ff6b35', edu:'#4a9eff', career:'#2a6abf', founded:'#00c896',
+  student:'#c77dff', collab:'#06d6a0', award:'#ffd166', biz:'#ef476f',
+  research:'#8ecae6'
 };
 const LC = {
-    '求学': '#4a9eff',
-    '工作': '#2a6abf',
-    '创立': '#00c896',
-    '师承': '#c77dff',
-    '商业': '#ef476f',
-    '合作': '#06d6a0',
-    '荣誉': '#ffd166',
-    '研究': '#8ecae6',
-    '隶属': '#2a4a7a'
+  '求学':'#4a9eff','工作':'#2a6abf','创立':'#00c896','师承':'#c77dff',
+  '商业':'#ef476f','合作':'#06d6a0','荣誉':'#ffd166','研究':'#8ecae6','隶属':'#2a4a7a',
+  '核心技术':'#7cc8ff'  // 新增：核心人物→技术成果的专属亮线
 };
-const LD = { '隶属': true, '研究': true }; // 虚线类型
+const LD = {'隶属':true,'研究':true};
 
 // ─────────────────────── 节点数据（谢晓亮关系网络）────────────────────────────────
 const N = [
-    // 核心人物
-    {
-        id: 'xxl',
-        lbl: '谢晓亮',
-        g: 'core',
-        r: 34,
-        desc: '单分子生物物理化学奠基人\n中国科学院院士\n美国国家科学院、医学院、\n艺术与科学学院三院外籍院士\n阿尔伯尼奖·Peter Debye奖·Founders奖\n全职归国任昌平实验室主任',
-        tags: ['中科院院士', '三院外籍院士', '单细胞基因组学']
-    },
+  {id:'xxl', lbl:'谢晓亮', g:'core', r:34,
+   desc:'单分子生物物理化学奠基人\n中国科学院院士\n美国家科学院/医学院/艺术与科学学院外籍院士\n阿尔伯尼奖·Peter Debye奖·Founders奖\n全职归国主任昌平实验室',
+   tags:['中科院院士','三院外籍院士','单细胞基因组学']},
 
-    // 求学机构
-    { id: 'pku_edu', lbl: '北京大学', g: 'edu', r: 14, desc: '化学学士 (1984年)\n成长于北大燕园', tags: ['本科', '化学'] },
-    { id: 'ucsd', lbl: ['加州大学', '圣地亚哥分校'], g: 'edu', r: 14, desc: '化学博士 (1990年)', tags: ['博士', '化学'] },
-    { id: 'uchicago', lbl: '芝加哥大学', g: 'edu', r: 14, desc: '博士后研究 (1990-1992年)', tags: ['博士后'] },
+  // 求学与任职机构
+  {id:'pku_edu', lbl:['北京大学','(学士)'], g:'edu', r:13, desc:'化学学士（1984）', tags:['本科']},
+  {id:'ucsd', lbl:['加州大学','圣地亚哥'], g:'edu', r:13, desc:'化学博士（1990）', tags:['博士']},
+  {id:'uchicago', lbl:['芝加哥大学','(博士后)'], g:'edu', r:13, desc:'博士后（1990-1992）', tags:['博士后']},
+  {id:'pnnl', lbl:['太平洋西北','国家实验室'], g:'career', r:13, desc:'1992-1999 独立研究组', tags:['PI']},
+  {id:'harvard', lbl:'哈佛大学', g:'career', r:15, desc:'终身教授（1999-2018）\n首位中国大陆冠名讲席教授', tags:['终身教授']},
+  {id:'pku_career', lbl:'北京大学', g:'career', r:17, desc:'2010创立BIOPIC\n2018全职归国任李兆基讲席教授', tags:['全职归国']},
+  {id:'changping', lbl:'昌平实验室', g:'career', r:15, desc:'2020年起任主任', tags:['主任']},
+  {id:'biopic', lbl:['BIOPIC','创新中心'], g:'career', r:14, desc:'生物医学前沿创新中心', tags:['2010创立']},
 
-    // 任职机构
-    { id: 'pnnl', lbl: ['太平洋西北', '国家实验室'], g: 'career', r: 14, desc: '1992年起建立独立研究组', tags: ['独立PI'] },
-    { id: 'harvard', lbl: '哈佛大学', g: 'career', r: 18, desc: '1999年：改革开放后哈佛聘任的\n第一位来自中国大陆的终身教授\n2009年：第一位冠名讲席教授', tags: ['终身教授', '冠名讲席'] },
-    { id: 'pku_career', lbl: '北京大学', g: 'career', r: 22, desc: '2010年创立BIOPIC\n2018年全职回北大\n李兆基讲席教授', tags: ['全职归国', '李兆基讲席'] },
-    { id: 'changping', lbl: '昌平实验室', g: 'career', r: 18, desc: '2020年起担任主任\n国家级生命科学实验室', tags: ['主任'] },
+  // 核心技术（内环）
+  {id:'foodie', lbl:'FOODIE', g:'founded', r:15,
+   desc:'脱氨酶单分子单细胞转录因子足迹技术\n近单碱基分辨率解析调控图谱\n已转化为试剂盒', tags:['转录因子','单细胞']},
+  {id:'scmicroc', lbl:'scMicro-C', g:'founded', r:15,
+   desc:'单细胞千碱基精度三维基因组结构\n首次发现多增强子中心\nNature Genetics', tags:['3D基因组']},
+  {id:'cgm', lbl:'CGM', g:'founded', r:14,
+   desc:'优化单细胞RNA测序基因模块识别\n更高精度基因关联分析', tags:['基因模块']},
+  {id:'malbac', lbl:'MALBAC', g:'founded', r:16,
+   desc:'全基因组扩增技术\n已助上万单基因遗传病家庭\n避免致病后代出生', tags:['遗传病','临床转化']},
+  {id:'sa55', lbl:'SA55抗体', g:'founded', r:16,
+   desc:'广谱中和抗体\n对所有新冠变异株保持高中和活性\n已进入临床试验', tags:['新冠','抗体']},
 
-    // 创立/技术成果
-    { id: 'biopic', lbl: ['生物医学前沿', '创新中心(BIOPIC)'], g: 'founded', r: 16, desc: '2010年创立于北京大学\n原名：生物动态光学成像中心\n生命科学前沿技术研发与转化', tags: ['2010创立', '技术转化'] },
-    { id: 'foodie', lbl: 'FOODIE技术', g: 'founded', r: 14, desc: '单分子单细胞转录因子足迹技术\n近单碱基分辨率解析基因组调控图谱\n已转化为试剂盒', tags: ['脱氨酶', '调控图谱'] },
-    { id: 'scmicroc', lbl: 'scMicro-C', g: 'founded', r: 14, desc: '单细胞三维基因组结构技术\n千碱基精度，首次发现多增强子中心\n发表于《Nature Genetics》', tags: ['单细胞', '3D基因组'] },
-    { id: 'cgm', lbl: 'CGM技术', g: 'founded', r: 14, desc: '优化单细胞RNA测序基因模块识别\n更高精度基因关联分析', tags: ['单细胞', 'RNA'] },
-    { id: 'malbac', lbl: 'MALBAC', g: 'founded', r: 16, desc: '全基因组扩增技术\n已助力上万单基因遗传病家庭\n避免致病后代出生', tags: ['全基因组扩增', '遗传病防治'] },
-    { id: 'sa55', lbl: 'SA55抗体', g: 'founded', r: 16, desc: '广谱中和抗体\n对XBB等所有新冠变异株保持高中和活性\n已进入临床试验', tags: ['新冠', '广谱中和'] },
+  // 学生/师承
+  {id:'lusj', lbl:'陆思嘉', g:'student', r:13, desc:'哈佛博士生\nMALBAC共同发明人', tags:['MALBAC']},
+  {id:'zongch', lbl:'宗诚航', g:'student', r:13, desc:'哈佛博士后\nMALBAC共同发明人', tags:['MALBAC']},
+  {id:'caoyl', lbl:'曹云龙', g:'student', r:15, desc:'昌平实验室领衔科学家\nSA55基础研发', tags:['SA55']},
 
-    // 师承学生
-    { id: 'lusj', lbl: '陆思嘉', g: 'student', r: 14, desc: '哈佛期间博士生\nMALBAC技术共同发明人', tags: ['MALBAC', '哈佛'] },
-    { id: 'zongch', lbl: '宗诚航', g: 'student', r: 14, desc: '哈佛期间博士后\nMALBAC技术共同发明人', tags: ['MALBAC', '哈佛'] },
-    { id: 'caoyl', lbl: '曹云龙', g: 'student', r: 16, desc: '现任昌平实验室领衔科学家\n在谢晓亮指导下完成SA55抗体基础研发', tags: ['SA55', '昌平实验室'] },
+  // 合作者
+  {id:'qiaoj', lbl:'乔杰', g:'collab', r:16, desc:'中国工程院院士\n北医三院生殖专家\nMALBAC临床转化核心', tags:['工程院院士','MALBAC']},
+  {id:'tangfc', lbl:'汤富酬', g:'collab', r:14, desc:'北京大学教授\n单细胞测序先驱\n产学研医铁三角', tags:['单细胞','MALBAC']},
+  {id:'tanlz', lbl:'谭隆志', g:'collab', r:14, desc:'斯坦福大学教授\nscMicro-C深度合作', tags:['scMicro-C']},
+  {id:'mawp', lbl:'马文平', g:'collab', r:14, desc:'昌平实验室副研究员\nCGM并列一作', tags:['CGM']},
+  {id:'hers', lbl:'何润生', g:'collab', r:14, desc:'BIOPIC/昌平实验室\nFOODIE并列一作', tags:['FOODIE']},
 
-    // 学术合作者
-    { id: 'qiaoj', lbl: '乔杰', g: 'collab', r: 16, desc: '中国工程院院士\n北京大学第三医院生殖医学专家\nMALBAC临床转化核心合作者', tags: ['工程院院士', '生殖医学'] },
-    { id: 'tangfc', lbl: '汤富酬', g: 'collab', r: 14, desc: '北京大学教授\n单细胞测序技术先驱\n与谢晓亮、乔杰组成产学研医铁三角', tags: ['单细胞测序', 'MALBAC'] },
-    { id: 'tanlz', lbl: '谭隆志', g: 'collab', r: 14, desc: '斯坦福大学教授\nscMicro-C技术合作研发者', tags: ['斯坦福', '3D基因组'] },
-    { id: 'mawp', lbl: '马文平', g: 'collab', r: 14, desc: '昌平实验室副研究员\nCGM技术并列第一作者', tags: ['CGM', '基因模块'] },
-    { id: 'hers', lbl: '何润生', g: 'collab', r: 14, desc: 'BIOPIC/昌平实验室副研究员\nFOODIE技术并列第一作者', tags: ['FOODIE', '转录因子'] },
+  // 产业
+  {id:'vazyme', lbl:'南京诺唯赞', g:'biz', r:13, desc:'FOODIE试剂盒合作', tags:['试剂盒']},
+  {id:'sinovac', lbl:'科兴', g:'biz', r:13, desc:'SA55产业化合作\n鼻喷/注射剂型', tags:['疫苗']},
 
-    // 奖项荣誉
-    { id: 'cas_acad', lbl: '中国科学院院士', g: 'award', r: 13, desc: '' },
-    { id: 'us_tri_acad', lbl: ['美国三院', '外籍院士'], g: 'award', r: 13, desc: '国家科学院 · 医学院 · 艺术与科学学院' },
-    { id: 'albany', lbl: '阿尔伯尼奖', g: 'award', r: 13, desc: '美国生物医学最高奖之一' },
-    { id: 'debye', lbl: 'Peter Debye奖', g: 'award', r: 13, desc: '美国物理化学最高奖' },
-    { id: 'founders', lbl: 'Founders奖', g: 'award', r: 13, desc: '美国生物物理最高奖' },
+  // 荣誉
+  {id:'cas_acad', lbl:'中国科学院院士', g:'award', r:13},
+  {id:'us_tri_acad', lbl:['美三院','外籍院士'], g:'award', r:13, desc:'国家科学院·医学院·艺术与科学学院'},
+  {id:'albany', lbl:'阿尔伯尼奖', g:'award', r:13, desc:'美国生物医学最高奖'},
+  {id:'debye', lbl:'Peter Debye奖', g:'award', r:13, desc:'美国物理化学最高奖'},
+  {id:'founders', lbl:'Founders奖', g:'award', r:13, desc:'美国生物物理最高奖'},
 
-    // 产业合作企业
-    { id: 'vazyme', lbl: '南京诺唯赞', g: 'biz', r: 13, desc: '与FOODIE技术合作开发\nHyperactive FOODIE Library Prep Kit', tags: ['试剂盒'] },
-    { id: 'sinovac', lbl: '科兴', g: 'biz', r: 13, desc: 'SA55抗体产业化合作方\n鼻喷和注射两种剂型进入临床试验', tags: ['疫苗', 'GMP生产'] },
-
-    // 研究方向
-    { id: 'biophys', lbl: '单分子生物物理化学', g: 'research', r: 13, desc: '奠基人之一' },
-    { id: 'singlecell', lbl: '单细胞基因组学', g: 'research', r: 13, desc: '开拓者，技术临床转化' },
-    { id: 'imaging', lbl: '相干拉曼散射显微成像', g: 'research', r: 13, desc: '开拓者' }
+  // 研究方向
+  {id:'biophys', lbl:'单分子生物物理', g:'research', r:13, desc:'奠基人'},
+  {id:'singlecell', lbl:'单细胞基因组学', g:'research', r:13, desc:'开拓者'},
+  {id:'imaging', lbl:'相干拉曼成像', g:'research', r:13, desc:'开拓者'}
 ];
 
-// ─────────────────────── 关系数据 ────────────────────────────────────────────────
 const L = [
-    // 求学
-    { s: 'xxl', t: 'pku_edu', type: '求学', lbl: '学士1984' },
-    { s: 'xxl', t: 'ucsd', type: '求学', lbl: '博士1990' },
-    { s: 'xxl', t: 'uchicago', type: '求学', lbl: '博士后' },
+  // 核心人物 → 求学/工作
+  {s:'xxl',t:'pku_edu',type:'求学',lbl:'1984'},
+  {s:'xxl',t:'ucsd',type:'求学',lbl:'1990'},
+  {s:'xxl',t:'uchicago',type:'求学',lbl:'博士后'},
+  {s:'xxl',t:'pnnl',type:'工作',lbl:'1992-99'},
+  {s:'xxl',t:'harvard',type:'工作',lbl:'1999-2018'},
+  {s:'xxl',t:'pku_career',type:'工作',lbl:'2018-今'},
+  {s:'xxl',t:'changping',type:'工作',lbl:'2020-今'},
+  {s:'xxl',t:'biopic',type:'创立',lbl:'2010'},
 
-    // 工作
-    { s: 'xxl', t: 'pnnl', type: '工作', lbl: '1992-1999' },
-    { s: 'xxl', t: 'harvard', type: '工作', lbl: '1999-2018' },
-    { s: 'xxl', t: 'pku_career', type: '工作', lbl: '2018-今' },
-    { s: 'xxl', t: 'changping', type: '工作', lbl: '2020-今主任' },
+  // ✦ 核心技术线（粗·亮）—— 谢晓亮 → 技术成果
+  {s:'xxl',t:'foodie',type:'核心技术',lbl:'首创'},
+  {s:'xxl',t:'scmicroc',type:'核心技术',lbl:'首创'},
+  {s:'xxl',t:'cgm',type:'核心技术',lbl:'研发'},
+  {s:'xxl',t:'malbac',type:'核心技术',lbl:'首创'},
+  {s:'xxl',t:'sa55',type:'核心技术',lbl:'筛选'},
 
-    // 创立
-    { s: 'xxl', t: 'biopic', type: '创立', lbl: '2010创立' },
-    { s: 'xxl', t: 'foodie', type: '创立', lbl: '技术开发' },
-    { s: 'xxl', t: 'scmicroc', type: '创立', lbl: '技术开发' },
-    { s: 'xxl', t: 'cgm', type: '创立', lbl: '技术开发' },
-    { s: 'xxl', t: 'malbac', type: '创立', lbl: '技术开发' },
-    { s: 'xxl', t: 'sa55', type: '创立', lbl: '抗体筛选' },
+  // 技术 → 人物/机构 （合作、师承、商业）
+  {s:'foodie',t:'hers',type:'合作',lbl:'并列一作'},
+  {s:'foodie',t:'vazyme',type:'商业',lbl:'试剂盒'},
+  {s:'scmicroc',t:'tanlz',type:'合作',lbl:'深度合作'},
+  {s:'cgm',t:'mawp',type:'合作',lbl:'并列一作'},
+  {s:'malbac',t:'qiaoj',type:'合作',lbl:'临床转化'},
+  {s:'malbac',t:'tangfc',type:'合作',lbl:'铁三角'},
+  {s:'malbac',t:'lusj',type:'师承',lbl:'共同发明'},
+  {s:'malbac',t:'zongch',type:'师承',lbl:'共同发明'},
+  {s:'sa55',t:'caoyl',type:'师承',lbl:'指导研发'},
+  {s:'sa55',t:'sinovac',type:'商业',lbl:'产业化'},
 
-    // 隶属
-    { s: 'pku_career', t: 'biopic', type: '隶属', lbl: '' },
+  // 机构隶属
+  {s:'pku_career',t:'biopic',type:'隶属',lbl:''},
+  {s:'changping',t:'biopic',type:'隶属',lbl:''},
 
-    // 师承
-    { s: 'xxl', t: 'lusj', type: '师承', lbl: '博士生' },
-    { s: 'xxl', t: 'zongch', type: '师承', lbl: '博士后' },
-    { s: 'xxl', t: 'caoyl', type: '师承', lbl: '指导研发' },
+  // 荣誉
+  {s:'xxl',t:'cas_acad',type:'荣誉',lbl:''},
+  {s:'xxl',t:'us_tri_acad',type:'荣誉',lbl:''},
+  {s:'xxl',t:'albany',type:'荣誉',lbl:''},
+  {s:'xxl',t:'debye',type:'荣誉',lbl:''},
+  {s:'xxl',t:'founders',type:'荣誉',lbl:''},
 
-    // 合作
-    { s: 'xxl', t: 'qiaoj', type: '合作', lbl: 'MALBAC临床' },
-    { s: 'xxl', t: 'tangfc', type: '合作', lbl: '单细胞测序' },
-    { s: 'xxl', t: 'tanlz', type: '合作', lbl: 'scMicro-C' },
-    { s: 'xxl', t: 'mawp', type: '合作', lbl: 'CGM技术' },
-    { s: 'xxl', t: 'hers', type: '合作', lbl: 'FOODIE技术' },
-    { s: 'xxl', t: 'caoyl', type: '合作', lbl: 'SA55抗体' },
-
-    // 商业
-    { s: 'foodie', t: 'vazyme', type: '商业', lbl: '试剂盒转化' },
-    { s: 'sa55', t: 'sinovac', type: '商业', lbl: '产业化开发' },
-
-    // 荣誉
-    { s: 'xxl', t: 'cas_acad', type: '荣誉', lbl: '' },
-    { s: 'xxl', t: 'us_tri_acad', type: '荣誉', lbl: '' },
-    { s: 'xxl', t: 'albany', type: '荣誉', lbl: '生物医学' },
-    { s: 'xxl', t: 'debye', type: '荣誉', lbl: '物理化学' },
-    { s: 'xxl', t: 'founders', type: '荣誉', lbl: '生物物理' },
-
-    // 研究
-    { s: 'xxl', t: 'biophys', type: '研究', lbl: '奠基' },
-    { s: 'xxl', t: 'singlecell', type: '研究', lbl: '开拓' },
-    { s: 'xxl', t: 'imaging', type: '研究', lbl: '开拓' }
+  // 研究方向
+  {s:'xxl',t:'biophys',type:'研究',lbl:''},
+  {s:'xxl',t:'singlecell',type:'研究',lbl:''},
+  {s:'xxl',t:'imaging',type:'研究',lbl:''}
 ];
 
-// ─────────────────────── CANVAS 初始化 ──────────────────────────────────────────
+// ─────────────────────── CANVAS初始化 ──────────────────────────────────────────
 const cv = document.getElementById('c');
 const cx = cv.getContext('2d');
 const dpr = window.devicePixelRatio || 1;
-
 function setSize() {
-    cv.width = window.innerWidth * dpr;
-    cv.height = window.innerHeight * dpr;
-    cv.style.width = window.innerWidth + 'px';
-    cv.style.height = window.innerHeight + 'px';
+  cv.width  = window.innerWidth  * dpr;
+  cv.height = window.innerHeight * dpr;
+  cv.style.width  = window.innerWidth  + 'px';
+  cv.style.height = window.innerHeight + 'px';
 }
 setSize();
 window.addEventListener('resize', setSize);
-
 const W = () => window.innerWidth;
 const H = () => window.innerHeight;
 
-// ─────────────────────── 初始位置布局 ──────────────────────────────────────────
-const GP = {
-    core: [0, 0],
-    edu: [-0.36, -0.08],
-    career: [0.02, -0.34],
-    founded: [0.18, 0.08],
-    student: [0.38, 0.06],
-    collab: [0.04, 0.36],
-    award: [-0.22, 0.3],
-    research: [-0.36, 0.22],
-    biz: [0.38, -0.2],
-    initiative: [0.12, 0.42]
-};
-const gcnt = {},
-    gidx = {};
-N.forEach(n => { gcnt[n.g] = (gcnt[n.g] || 0) + 1; });
-N.forEach(n => {
-    const gp = GP[n.g] || [0, 0];
-    gidx[n.g] = (gidx[n.g] || 0) + 1;
-    const idx = gidx[n.g],
-        cnt = gcnt[n.g];
-    const spread = Math.min(cnt * 38, 150);
-    const angle = (idx / cnt) * Math.PI * 2;
-    n.x = W() / 2 + gp[0] * W() * 0.4 + Math.cos(angle) * spread * 0.5 + (Math.random() - 0.5) * 20;
-    n.y = H() / 2 + gp[1] * H() * 0.4 + Math.sin(angle) * spread * 0.5 + (Math.random() - 0.5) * 20;
-    n.vx = 0;
-    n.vy = 0;
-    n.dragging = false;
-});
-
-// 解析链接
-const NM = new Map(N.map(n => [n.id, n]));
-const links = L.map(l => ({ src: NM.get(l.s), tgt: NM.get(l.t), type: l.type, lbl: l.lbl }))
-    .filter(l => l.src && l.tgt);
-
+// ─────────────────────── 分层环形初始位置 ────────────────────────────────────────
+const NM = new Map(N.map(n=>[n.id,n]));
+const links = L.map(l=>({src:NM.get(l.s), tgt:NM.get(l.t), type:l.type, lbl:l.lbl})).filter(l=>l.src&&l.tgt);
 document.getElementById('nc').textContent = N.length;
 document.getElementById('lc').textContent = links.length;
 
-// ─────────────────────── 力导向模拟 ──────────────────────────────────────────
-const LDIST = { '求学': 130, '工作': 140, '创立': 118, '师承': 130, '商业': 105, '合作': 165, '荣誉': 105, '研究': 108,
-    '隶属': 82 };
+// 内环（技术节点）半径取屏幕较短边的 0.22，外环取 0.38
+const innerR = Math.min(W(), H()) * 0.22;
+const outerR = Math.min(W(), H()) * 0.38;
+const coreX = W()/2, coreY = H()/2;
+
+// 统计内环节点（g === 'founded'）与外环节点（其他非核心）
+const innerNodes = N.filter(n => n.g === 'founded');
+const outerNodes = N.filter(n => n.g !== 'core' && n.g !== 'founded');
+const coreNode = N.find(n => n.g === 'core');
+
+// 核心放在正中
+if (coreNode) { coreNode.x = coreX; coreNode.y = coreY; coreNode.vx = 0; coreNode.vy = 0; }
+
+// 内环均匀分布
+innerNodes.forEach((n, i) => {
+  const angle = (i / innerNodes.length) * Math.PI * 2 - Math.PI/2;
+  n.x = coreX + Math.cos(angle) * innerR + (Math.random()-0.5)*20;
+  n.y = coreY + Math.sin(angle) * innerR + (Math.random()-0.5)*20;
+  n.vx = 0; n.vy = 0; n.dragging = false;
+});
+
+// 外环按类型微调角度，整体均匀分布
+outerNodes.forEach((n, i) => {
+  const angle = (i / outerNodes.length) * Math.PI * 2 - Math.PI/2;
+  n.x = coreX + Math.cos(angle) * outerR + (Math.random()-0.5)*25;
+  n.y = coreY + Math.sin(angle) * outerR + (Math.random()-0.5)*25;
+  n.vx = 0; n.vy = 0; n.dragging = false;
+});
+
+// ─────────────────────── 力导向模拟（强化分层）─────────────────────────────────
+const LDIST = {
+  '核心技术':55,  // 极短距离，让技术节点紧贴核心
+  '创立':70,
+  '合作':130, '师承':120, '商业':115,
+  '求学':130, '工作':140, '荣誉':105, '研究':108, '隶属':82
+};
 let alpha = 1.0;
 
 function tick() {
-    if (alpha < 0.002) return;
-    alpha *= 0.975;
+  if (alpha < 0.002) return;
+  alpha *= 0.975;
 
-    // 斥力
-    for (let i = 0; i < N.length; i++) {
-        const a = N[i];
-        for (let j = i + 1; j < N.length; j++) {
-            const b = N[j];
-            const dx = b.x - a.x,
-                dy = b.y - a.y;
-            const d2 = dx * dx + dy * dy + 1;
-            const d = Math.sqrt(d2);
-            const str = (a.g === 'core' || b.g === 'core') ? 20000 : 5500;
-            const f = str / d2;
-            const fx = f * dx / d,
-                fy = f * dy / d;
-            a.vx -= fx;
-            a.vy -= fy;
-            b.vx += fx;
-            b.vy += fy;
-        }
+  // 斥力
+  for (let i = 0; i < N.length; i++) {
+    const a = N[i];
+    for (let j = i+1; j < N.length; j++) {
+      const b = N[j];
+      const dx = b.x-a.x, dy = b.y-a.y;
+      const d2 = dx*dx+dy*dy+1;
+      const d = Math.sqrt(d2);
+      const str = (a.g==='core'||b.g==='core') ? 28000 : 6000;
+      const f = str / d2;
+      const fx = f*dx/d, fy = f*dy/d;
+      a.vx -= fx; a.vy -= fy;
+      b.vx += fx; b.vy += fy;
     }
+  }
 
-    // 弹簧
-    links.forEach(l => {
-        const dx = l.tgt.x - l.src.x,
-            dy = l.tgt.y - l.src.y;
-        const d = Math.sqrt(dx * dx + dy * dy) || 0.1;
-        const rest = LDIST[l.type] || 140;
-        const f = (d - rest) * 0.1;
-        const fx = f * dx / d,
-            fy = f * dy / d;
-        l.src.vx += fx;
-        l.src.vy += fy;
-        l.tgt.vx -= fx;
-        l.tgt.vy -= fy;
-    });
+  // 弹簧
+  links.forEach(l => {
+    const dx = l.tgt.x-l.src.x, dy = l.tgt.y-l.src.y;
+    const d = Math.sqrt(dx*dx+dy*dy)||0.1;
+    const rest = LDIST[l.type]||140;
+    const stiffness = l.type==='核心技术'?0.25:0.1;  // 技术线更强拉力
+    const f = (d-rest)*stiffness;
+    const fx = f*dx/d, fy = f*dy/d;
+    l.src.vx += fx; l.src.vy += fy;
+    l.tgt.vx -= fx; l.tgt.vy -= fy;
+  });
 
-    // 中心引力
-    N.forEach(n => {
-        n.vx += (W() / 2 - n.x) * 0.008;
-        n.vy += (H() / 2 - n.y) * 0.008;
-    });
+  // 核心固定在中心，外环节点微弱向中心靠拢
+  N.forEach(n => {
+    if (n.g === 'core') {
+      n.vx += (coreX - n.x) * 0.5;
+      n.vy += (coreY - n.y) * 0.5;
+    } else if (n.g === 'founded') {
+      n.vx += (coreX - n.x) * 0.015;
+      n.vy += (coreY - n.y) * 0.015;
+    } else {
+      n.vx += (coreX - n.x) * 0.004;
+      n.vy += (coreY - n.y) * 0.004;
+    }
+  });
 
-    // 速度积分
-    N.forEach(n => {
-        if (n.dragging) return;
-        n.vx *= 0.78;
-        n.vy *= 0.78;
-        n.x += n.vx * alpha;
-        n.y += n.vy * alpha;
-    });
+  // 积分
+  N.forEach(n => {
+    if (n.dragging) return;
+    n.vx *= 0.78; n.vy *= 0.78;
+    n.x += n.vx * alpha;
+    n.y += n.vy * alpha;
+  });
 }
 
-// ─────────────────────── 视图变换 ──────────────────────────────────────────────
-let tx = 0,
-    ty = 0,
-    sc = 1;
+// ─────────────────────── 视图变换 ────────────────────────────────────────────────
+let tx=0, ty=0, sc=1;
+function toScreen(wx,wy){ return [wx*sc+tx, wy*sc+ty]; }
+function toWorld(sx,sy){ return [(sx-tx)/sc, (sy-ty)/sc]; }
 
-function toScreen(wx, wy) { return [wx * sc + tx, wy * sc + ty]; }
-
-function toWorld(sx, sy) { return [(sx - tx) / sc, (sy - ty) / sc]; }
-
-// ─────────────────────── 碰撞检测 ──────────────────────────────────────────────
-function nodeAt(sx, sy) {
-    const [wx, wy] = toWorld(sx, sy);
-    for (let i = N.length - 1; i >= 0; i--) {
-        const n = N[i],
-            dx = n.x - wx,
-            dy = n.y - wy;
-        if (dx * dx + dy * dy < n.r * n.r) return n;
-    }
-    return null;
+function nodeAt(sx,sy) {
+  const [wx,wy]=toWorld(sx,sy);
+  for (let i=N.length-1;i>=0;i--) {
+    const n=N[i], dx=n.x-wx, dy=n.y-wy;
+    if (dx*dx+dy*dy<n.r*n.r) return n;
+  }
+  return null;
 }
 
-// ─────────────────────── 高亮关联集合 ──────────────────────────────────────────
 function connected(node) {
-    const ids = new Set([node.id]);
-    links.forEach(l => {
-        if (l.src.id === node.id) ids.add(l.tgt.id);
-        if (l.tgt.id === node.id) ids.add(l.src.id);
-    });
-    return ids;
+  const ids=new Set([node.id]);
+  links.forEach(l=>{
+    if(l.src.id===node.id) ids.add(l.tgt.id);
+    if(l.tgt.id===node.id) ids.add(l.src.id);
+  });
+  return ids;
 }
 
-// ─────────────────────── 颜色工具 ──────────────────────────────────────────────
-function rgba(hex, a) {
-    const r = parseInt(hex.slice(1, 3), 16),
-        g = parseInt(hex.slice(3, 5), 16),
-        b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r},${g},${b},${a})`;
+function rgba(hex,a){
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+function lighter(hex,n=60){
+  return '#'+[1,3,5].map(i=>Math.min(255,parseInt(hex.slice(i,i+2),16)+n).toString(16).padStart(2,'0')).join('');
 }
 
-function lighter(hex, n = 60) {
-    return '#' + [1, 3, 5].map(i => Math.min(255, parseInt(hex.slice(i, i + 2), 16) + n)
-        .toString(16).padStart(2, '0')).join('');
-}
-
-// ─────────────────────── 绘制 ──────────────────────────────────────────────────
-let hovNode = null,
-    selNode = null;
+// ─────────────────────── 绘制 ────────────────────────────────────────────────────
+let hovNode=null, selNode=null;
 
 function draw() {
-    cx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    cx.clearRect(0, 0, W(), H());
+  cx.setTransform(dpr,0,0,dpr,0,0);
+  cx.clearRect(0,0,W(),H());
 
-    const conn = selNode ? connected(selNode) : null;
+  const conn = selNode ? connected(selNode) : null;
 
-    // 绘制连线
-    links.forEach(l => {
-        const [x1, y1] = toScreen(l.src.x, l.src.y);
-        const [x2, y2] = toScreen(l.tgt.x, l.tgt.y);
-        const col = LC[l.type] || '#4a6a9a';
-        let op = 0.55;
-        if (conn) op = (conn.has(l.src.id) && conn.has(l.tgt.id)) ? 0.85 : 0.06;
+  // 绘制连线
+  links.forEach(l => {
+    const [x1,y1] = toScreen(l.src.x, l.src.y);
+    const [x2,y2] = toScreen(l.tgt.x, l.tgt.y);
+    const col = LC[l.type]||'#4a6a9a';
+    let op = 0.55;
+    if (conn) op = (conn.has(l.src.id)&&conn.has(l.tgt.id)) ? 0.9 : 0.06;
 
-        const dx = x2 - x1,
-            dy = y2 - y1,
-            dist = Math.sqrt(dx * dx + dy * dy) || 0.1;
-        const ex = x2 - (l.tgt.r * sc + 9) * dx / dist;
-        const ey = y2 - (l.tgt.r * sc + 9) * dy / dist;
+    const dx=x2-x1, dy=y2-y1, dist=Math.sqrt(dx*dx+dy*dy)||0.1;
+    const ex=x2-(l.tgt.r*sc+9)*dx/dist;
+    const ey=y2-(l.tgt.r*sc+9)*dy/dist;
 
-        cx.save();
-        cx.globalAlpha = op;
-        if (LD[l.type]) cx.setLineDash([4, 3]);
-        else cx.setLineDash([]);
-        cx.beginPath();
-        cx.moveTo(x1, y1);
-        cx.lineTo(ex, ey);
-        cx.strokeStyle = col;
-        cx.lineWidth = 1.5;
-        cx.stroke();
+    cx.save();
+    cx.globalAlpha = op;
+    if(LD[l.type]) cx.setLineDash([4,3]); else cx.setLineDash([]);
+    cx.beginPath(); cx.moveTo(x1,y1); cx.lineTo(ex,ey);
+    cx.strokeStyle=col;
+    cx.lineWidth = l.type==='核心技术' ? 3.2 : 1.5;
+    cx.stroke();
 
-        // 箭头
-        const ang = Math.atan2(ey - y1, ex - x1);
-        cx.setLineDash([]);
-        cx.beginPath();
-        cx.moveTo(ex, ey);
-        cx.lineTo(ex - 8 * Math.cos(ang - 0.38), ey - 8 * Math.sin(ang - 0.38));
-        cx.lineTo(ex - 8 * Math.cos(ang + 0.38), ey - 8 * Math.sin(ang + 0.38));
-        cx.closePath();
-        cx.fillStyle = col;
-        cx.fill();
+    // 箭头
+    const ang=Math.atan2(ey-y1,ex-x1);
+    cx.setLineDash([]);
+    cx.beginPath();
+    cx.moveTo(ex,ey);
+    cx.lineTo(ex-8*Math.cos(ang-0.38), ey-8*Math.sin(ang-0.38));
+    cx.lineTo(ex-8*Math.cos(ang+0.38), ey-8*Math.sin(ang+0.38));
+    cx.closePath(); cx.fillStyle=col; cx.fill();
 
-        // 标签
-        if (l.lbl && op > 0.2) {
-            const fs = Math.max(8, 9 * Math.min(sc, 1.4));
-            cx.font = `${fs}px 'PingFang SC','Microsoft YaHei',sans-serif`;
-            cx.fillStyle = '#7a9abd';
-            cx.textAlign = 'center';
-            cx.textBaseline = 'middle';
-            cx.fillText(l.lbl, (x1 + x2) / 2, (y1 + y2) / 2 - 4);
-        }
-        cx.restore();
-    });
+    // 标签
+    if(l.lbl && op>0.2) {
+      const fs = Math.max(8, 9*Math.min(sc,1.4));
+      cx.font=`${fs}px 'PingFang SC','Microsoft YaHei',sans-serif`;
+      cx.fillStyle='#7a9abd'; cx.textAlign='center'; cx.textBaseline='middle';
+      cx.fillText(l.lbl, (x1+x2)/2, (y1+y2)/2-4);
+    }
+    cx.restore();
+  });
 
-    // 绘制节点
-    N.forEach(n => {
-        const [sx, sy] = toScreen(n.x, n.y);
-        const sr = n.r * sc;
-        const col = GC[n.g] || '#4a6a9a';
-        let op = 1;
-        if (conn && !conn.has(n.id)) op = 0.12;
+  // 绘制节点
+  N.forEach(n => {
+    const [sx,sy]=toScreen(n.x,n.y);
+    const sr=n.r*sc;
+    const col=GC[n.g]||'#4a6a9a';
+    let op=1;
+    if(conn&&!conn.has(n.id)) op=0.12;
 
-        cx.save();
-        cx.globalAlpha = op;
+    cx.save();
+    cx.globalAlpha=op;
 
-        // 核心脉冲环
-        if (n.g === 'core') {
-            cx.beginPath();
-            cx.arc(sx, sy, sr + 11, 0, Math.PI * 2);
-            cx.strokeStyle = rgba('#ff6b35', 0.22);
-            cx.lineWidth = 1.5;
-            cx.setLineDash([5, 4]);
-            cx.stroke();
-            cx.setLineDash([]);
-        }
+    // 核心脉冲
+    if(n.g==='core') {
+      cx.beginPath(); cx.arc(sx,sy,sr+11,0,Math.PI*2);
+      cx.strokeStyle=rgba('#ff6b35',0.22); cx.lineWidth=1.5;
+      cx.setLineDash([5,4]); cx.stroke(); cx.setLineDash([]);
+    }
 
-        // 悬浮/选中光晕
-        if (n === hovNode || n === selNode) {
-            const grd = cx.createRadialGradient(sx, sy, sr * 0.4, sx, sy, sr + 10);
-            grd.addColorStop(0, rgba(col, 0.35));
-            grd.addColorStop(1, rgba(col, 0));
-            cx.beginPath();
-            cx.arc(sx, sy, sr + 10, 0, Math.PI * 2);
-            cx.fillStyle = grd;
-            cx.fill();
-        }
+    // 悬浮/选中光晕
+    if(n===hovNode || n===selNode) {
+      const grd=cx.createRadialGradient(sx,sy,sr*0.4,sx,sy,sr+10);
+      grd.addColorStop(0,rgba(col,0.35));
+      grd.addColorStop(1,rgba(col,0));
+      cx.beginPath(); cx.arc(sx,sy,sr+10,0,Math.PI*2);
+      cx.fillStyle=grd; cx.fill();
+    }
 
-        // 主体圆
-        cx.beginPath();
-        cx.arc(sx, sy, sr, 0, Math.PI * 2);
-        cx.fillStyle = rgba(col, n.g === 'core' ? 1 : 0.82);
-        cx.fill();
-        cx.strokeStyle = lighter(col, 55);
-        cx.lineWidth = n.g === 'core' ? 2.5 : 1.5;
-        cx.stroke();
+    // 节点圆
+    cx.beginPath(); cx.arc(sx,sy,sr,0,Math.PI*2);
+    cx.fillStyle=rgba(col, n.g==='core'?1:0.82); cx.fill();
+    cx.strokeStyle=lighter(col,55); cx.lineWidth=n.g==='core'?2.5:1.5; cx.stroke();
 
-        // 标签
-        const lines = Array.isArray(n.lbl) ? n.lbl : [n.lbl];
-        const fs = Math.max(8, Math.min(13, n.r * 0.44)) * Math.max(0.65, sc);
-        cx.font = (n.g === 'core' ? 'bold ' : '') + `${fs}px 'PingFang SC','Microsoft YaHei',sans-serif`;
-        cx.textAlign = 'center';
-        cx.textBaseline = 'middle';
+    // 标签
+    const lines=Array.isArray(n.lbl)?n.lbl:[n.lbl];
+    const fs = Math.max(8, Math.min(13, n.r*0.44))*Math.max(0.65,sc);
+    cx.font=(n.g==='core'?'bold ':'')+`${fs}px 'PingFang SC','Microsoft YaHei',sans-serif`;
+    cx.textAlign='center'; cx.textBaseline='middle';
 
-        if (n.g === 'core') {
-            cx.fillStyle = '#fff';
-            const lh = fs * 1.35;
-            lines.forEach((ln, i) => {
-                cx.fillText(ln, sx, sy + (i - (lines.length - 1) / 2) * lh);
-            });
-        } else {
-            cx.fillStyle = '#d4e8f8';
-            const lh = Math.max(10, fs * 1.25);
-            const by = sy + sr + 3;
-            lines.forEach((ln, i) => { cx.fillText(ln, sx, by + i * lh + lh * 0.5); });
-        }
-
-        cx.restore();
-    });
+    if(n.g==='core') {
+      cx.fillStyle='#fff';
+      const lh=fs*1.35;
+      lines.forEach((ln,i)=>{ cx.fillText(ln, sx, sy+(i-(lines.length-1)/2)*lh); });
+    } else {
+      cx.fillStyle='#d4e8f8';
+      const lh=Math.max(10,fs*1.25);
+      const by=sy+sr+3;
+      lines.forEach((ln,i)=>{ cx.fillText(ln, sx, by+i*lh+lh*0.5); });
+    }
+    cx.restore();
+  });
 }
 
-// ─────────────────────── 动画循环 ──────────────────────────────────────────────
-(function loop() { tick();
-    draw();
-    requestAnimationFrame(loop); })();
+// ─────────────────────── 动画循环 ────────────────────────────────────────────────
+(function loop(){ tick(); draw(); requestAnimationFrame(loop); })();
 
-// ─────────────────────── 提示框 ─────────────────────────────────────────────────
+// ─────────────────────── 提示框 ──────────────────────────────────────────────────
 const tip = document.getElementById('tooltip');
+function showTip(n,e) {
+  const lbl=Array.isArray(n.lbl)?n.lbl.join(' '):n.lbl;
+  tip.innerHTML=`<h3>${lbl}</h3><div class="desc">${n.desc}</div>${n.tags.map(t=>`<span class="tag">${t}</span>`).join('')}`;
+  tip.style.display='block';
+  let lx=e.clientX+15, ly=e.clientY-10;
+  if(lx+290>W()) lx=e.clientX-295;
+  if(ly+220>H()) ly=e.clientY-220;
+  tip.style.left=lx+'px'; tip.style.top=ly+'px';
+}
+function hideTip(){ tip.style.display='none'; }
 
-function showTip(n, e) {
-    const lbl = Array.isArray(n.lbl) ? n.lbl.join(' ') : n.lbl;
-    tip.innerHTML =
-        `<h3>${lbl}</h3><div class="desc">${n.desc}</div>${n.tags.map(t => `<span class="tag">${t}</span>`).join('')}`;
-    tip.style.display = 'block';
-    let lx = e.clientX + 15,
-        ly = e.clientY - 10;
-    if (lx + 290 > W()) lx = e.clientX - 295;
-    if (ly + 220 > H()) ly = e.clientY - 220;
-    tip.style.left = lx + 'px';
-    tip.style.top = ly + 'px';
+// ─────────────────────── 鼠标/触摸交互 ───────────────────────────────────────────
+let panning=false, panOrig=null, dragN=null, moveDistSq=0, mdPos=null;
+function getXY(e){
+  const r=cv.getBoundingClientRect();
+  return [e.clientX-r.left, e.clientY-r.top];
 }
 
-function hideTip() { tip.style.display = 'none'; }
-
-// ─────────────────────── 鼠标事件 ──────────────────────────────────────────────
-let panning = false,
-    panOrig = null,
-    dragN = null,
-    moveDistSq = 0,
-    mdPos = null;
-
-function getXY(e) {
-    const r = cv.getBoundingClientRect();
-    return [e.clientX - r.left, e.clientY - r.top];
-}
-
-cv.addEventListener('mousemove', e => {
-    const [sx, sy] = getXY(e);
-    if (mdPos) moveDistSq = (sx - mdPos[0]) ** 2 + (sy - mdPos[1]) ** 2;
-
-    if (dragN) {
-        const [wx, wy] = toWorld(sx, sy);
-        dragN.x = wx;
-        dragN.y = wy;
-        dragN.vx = 0;
-        dragN.vy = 0;
-        alpha = Math.max(alpha, 0.2);
-        return;
-    }
-    if (panning) { tx = sx - panOrig[0];
-        ty = sy - panOrig[1]; return; }
-
-    const n = nodeAt(sx, sy);
-    hovNode = n;
-    cv.style.cursor = n ? 'pointer' : 'grab';
-    if (n) showTip(n, e);
-    else hideTip();
+cv.addEventListener('mousemove', e=>{
+  const [sx,sy]=getXY(e);
+  if(mdPos) moveDistSq=(sx-mdPos[0])**2+(sy-mdPos[1])**2;
+  if(dragN) {
+    const [wx,wy]=toWorld(sx,sy);
+    dragN.x=wx; dragN.y=wy; dragN.vx=0; dragN.vy=0;
+    alpha=Math.max(alpha,0.2);
+    return;
+  }
+  if(panning){ tx=sx-panOrig[0]; ty=sy-panOrig[1]; return; }
+  const n=nodeAt(sx,sy);
+  hovNode=n;
+  cv.style.cursor=n?'pointer':'grab';
+  if(n) showTip(n,e); else hideTip();
 });
 
-cv.addEventListener('mousedown', e => {
-    const [sx, sy] = getXY(e);
-    mdPos = [sx, sy];
-    moveDistSq = 0;
-    const n = nodeAt(sx, sy);
-    if (n) { dragN = n;
-        n.dragging = true; } else { panning = true;
-        panOrig = [sx - tx, sy - ty]; }
-    cv.classList.add('grabbing');
+cv.addEventListener('mousedown', e=>{
+  const [sx,sy]=getXY(e);
+  mdPos=[sx,sy]; moveDistSq=0;
+  const n=nodeAt(sx,sy);
+  if(n){ dragN=n; n.dragging=true; }
+  else { panning=true; panOrig=[sx-tx,sy-ty]; }
+  cv.classList.add('grabbing');
 });
 
-cv.addEventListener('mouseup', e => {
-    const [sx, sy] = getXY(e);
-    if (moveDistSq < 16) {
-        const n = nodeAt(sx, sy);
-        selNode = n ? (selNode === n ? null : n) : null;
-    }
-    if (dragN) { dragN.dragging = false;
-        dragN = null; }
-    panning = false;
-    mdPos = null;
-    cv.classList.remove('grabbing');
-    cv.style.cursor = 'grab';
+cv.addEventListener('mouseup', e=>{
+  const [sx,sy]=getXY(e);
+  if(moveDistSq<16) {
+    const n=nodeAt(sx,sy);
+    selNode = n ? (selNode===n?null:n) : null;
+  }
+  if(dragN){ dragN.dragging=false; dragN=null; }
+  panning=false; mdPos=null;
+  cv.classList.remove('grabbing');
+  cv.style.cursor='grab';
 });
 
-cv.addEventListener('mouseleave', () => {
-    panning = false;
-    if (dragN) { dragN.dragging = false;
-        dragN = null; }
-    hideTip();
-    cv.classList.remove('grabbing');
-});
+cv.addEventListener('mouseleave',()=>{ panning=false; if(dragN){dragN.dragging=false;dragN=null;} hideTip(); cv.classList.remove('grabbing'); });
 
-cv.addEventListener('wheel', e => {
-    e.preventDefault();
-    const [sx, sy] = getXY(e);
-    const factor = e.deltaY < 0 ? 1.12 : 0.89;
-    const nsc = Math.max(0.18, Math.min(4.5, sc * factor));
-    tx = sx - (sx - tx) * (nsc / sc);
-    ty = sy - (sy - ty) * (nsc / sc);
-    sc = nsc;
-}, { passive: false });
+cv.addEventListener('wheel', e=>{
+  e.preventDefault();
+  const [sx,sy]=getXY(e);
+  const factor = e.deltaY<0 ? 1.12 : 0.89;
+  const nsc = Math.max(0.18, Math.min(4.5, sc*factor));
+  tx = sx - (sx-tx)*(nsc/sc);
+  ty = sy - (sy-ty)*(nsc/sc);
+  sc = nsc;
+},{passive:false});
 
 // 触摸支持
-let t0 = null;
-cv.addEventListener('touchstart', e => {
-    e.preventDefault();
-    const t = e.touches[0];
-    const r = cv.getBoundingClientRect();
-    const sx = t.clientX - r.left,
-        sy = t.clientY - r.top;
-    const n = nodeAt(sx, sy);
-    if (n) { dragN = n;
-        n.dragging = true; } else { panning = true;
-        panOrig = [sx - tx, sy - ty];
-        t0 = [sx, sy]; }
-}, { passive: false });
-
-cv.addEventListener('touchmove', e => {
-    e.preventDefault();
-    const t = e.touches[0];
-    const r = cv.getBoundingClientRect();
-    const sx = t.clientX - r.left,
-        sy = t.clientY - r.top;
-    if (dragN) { const [wx, wy] = toWorld(sx, sy);
-        dragN.x = wx;
-        dragN.y = wy;
-        alpha = Math.max(alpha, 0.2); } else if (panning) { tx = sx - panOrig[0];
-        ty = sy - panOrig[1]; }
-}, { passive: false });
-
-cv.addEventListener('touchend', e => {
-    if (dragN) { dragN.dragging = false;
-        dragN = null; }
-    panning = false;
-    if (t0 && e.changedTouches.length) {
-        const t = e.changedTouches[0];
-        const r = cv.getBoundingClientRect();
-        const sx = t.clientX - r.left,
-            sy = t.clientY - r.top;
-        if ((sx - t0[0]) ** 2 + (sy - t0[1]) ** 2 < 25) {
-            const n = nodeAt(sx, sy);
-            selNode = n ? (selNode === n ? null : n) : null;
-        }
+let t0=null;
+cv.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  const t=e.touches[0]; const r=cv.getBoundingClientRect();
+  const sx=t.clientX-r.left, sy=t.clientY-r.top;
+  const n=nodeAt(sx,sy);
+  if(n){ dragN=n; n.dragging=true; }
+  else { panning=true; panOrig=[sx-tx,sy-ty]; t0=[sx,sy]; }
+},{passive:false});
+cv.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  const t=e.touches[0]; const r=cv.getBoundingClientRect();
+  const sx=t.clientX-r.left, sy=t.clientY-r.top;
+  if(dragN){ const[wx,wy]=toWorld(sx,sy); dragN.x=wx; dragN.y=wy; alpha=Math.max(alpha,0.2); }
+  else if(panning){ tx=sx-panOrig[0]; ty=sy-panOrig[1]; }
+},{passive:false});
+cv.addEventListener('touchend',e=>{
+  if(dragN){ dragN.dragging=false; dragN=null; }
+  panning=false;
+  if(t0&&e.changedTouches.length){
+    const t=e.changedTouches[0]; const r=cv.getBoundingClientRect();
+    const sx=t.clientX-r.left, sy=t.clientY-r.top;
+    if((sx-t0[0])**2+(sy-t0[1])**2<25){
+      const n=nodeAt(sx,sy);
+      selNode=n?(selNode===n?null:n):null;
     }
-    t0 = null;
+  }
+  t0=null;
 });
-
-// 双指缩放
-let lastDist = null;
-cv.addEventListener('touchmove', e => {
-    if (e.touches.length === 2) {
-        const r = cv.getBoundingClientRect();
-        const t0 = e.touches[0],
-            t1 = e.touches[1];
-        const d = Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY);
-        if (lastDist) {
-            const factor = d / lastDist;
-            const mx = (t0.clientX + t1.clientX) / 2 - r.left;
-            const my = (t0.clientY + t1.clientY) / 2 - r.top;
-            const nsc = Math.max(0.18, Math.min(4.5, sc * factor));
-            tx = mx - (mx - tx) * (nsc / sc);
-            ty = my - (my - ty) * (nsc / sc);
-            sc = nsc;
-        }
-        lastDist = d;
-    } else { lastDist = null; }
-}, { passive: false });
-cv.addEventListener('touchend', () => { lastDist = null; });
+let lastDist=null;
+cv.addEventListener('touchmove', e=>{
+  if(e.touches.length===2){
+    const r=cv.getBoundingClientRect();
+    const t0=e.touches[0], t1=e.touches[1];
+    const d=Math.hypot(t1.clientX-t0.clientX, t1.clientY-t0.clientY);
+    if(lastDist){
+      const factor=d/lastDist;
+      const mx=(t0.clientX+t1.clientX)/2-r.left;
+      const my=(t0.clientY+t1.clientY)/2-r.top;
+      const nsc=Math.max(0.18,Math.min(4.5,sc*factor));
+      tx=mx-(mx-tx)*(nsc/sc); ty=my-(my-ty)*(nsc/sc); sc=nsc;
+    }
+    lastDist=d;
+  } else { lastDist=null; }
+},{passive:false});
+cv.addEventListener('touchend',()=>{ lastDist=null; });
 </script>
 </body>
 </html>
